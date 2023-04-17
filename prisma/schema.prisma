@@ -1,0 +1,101 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model houses{
+
+  id Int @id @default(autoincrement())
+  name String
+  location String
+  price Int
+  image String?
+  number_of_rooms Int
+  reservations reservations[]
+  amenities HousesOnAmenities[]
+  owner owners @relation(fields: [owner_id] , references: [id] , onDelete: Cascade, onUpdate: Cascade)
+  owner_id Int 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+
+}
+
+model owners{
+  id Int @id @default(autoincrement())
+  first_name String
+  last_name String
+  contact_number String
+  physical_address String
+  email String
+  houses houses[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+
+model users{
+  id Int @id @default(autoincrement())
+  first_name String
+  last_name  String
+  email String
+  username String
+  password String
+  role Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+
+model reservations{
+  id Int @id @default(autoincrement())
+  start_date DateTime
+  leave_date DateTime
+  total_price Int
+  customer customers @relation(fields: [customerId] , references: [id] , onDelete: Cascade, onUpdate: Cascade)
+  customerId Int
+  house houses @relation(fields: [houseId] , references: [id] , onDelete: Cascade, onUpdate: Cascade)
+  houseId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+}
+
+model amentities{
+  id Int @id @default(autoincrement())
+  amenity_name String
+  houses HousesOnAmenities[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+}
+
+model customers{
+  id Int @id @default(autoincrement())
+  first_name String
+  last_name String
+  email String
+  contact String
+  password String
+  reservation reservations[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+}
+
+model HousesOnAmenities{
+  id Int @id @default(autoincrement())
+  house houses @relation(fields: [houseId] , references: [id] ,onDelete: Cascade, onUpdate: Cascade)
+  houseId Int
+  amenity amentities @relation(fields: [amenityId] , references: [id],onDelete: Cascade, onUpdate: Cascade)
+  amenityId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+
+}
+
