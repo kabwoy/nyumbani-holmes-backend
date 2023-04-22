@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+
 }
 
 datasource db {
@@ -21,7 +22,7 @@ model houses{
   reservations reservations[]
   amenities HousesOnAmenities[]
   owner owners @relation(fields: [owner_id] , references: [id] , onDelete: Cascade, onUpdate: Cascade)
-  owner_id Int 
+  owner_id Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
 
@@ -89,7 +90,7 @@ model customers{
 }
 
 model HousesOnAmenities{
-  id Int @id @default(autoincrement())
+  // id Int @id @default(autoincrement())
   house houses @relation(fields: [houseId] , references: [id] ,onDelete: Cascade, onUpdate: Cascade)
   houseId Int
   amenity amentities @relation(fields: [amenityId] , references: [id],onDelete: Cascade, onUpdate: Cascade)
@@ -97,5 +98,8 @@ model HousesOnAmenities{
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
 
+  @@id([houseId , amenityId])
+
 }
+
 

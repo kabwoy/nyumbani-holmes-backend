@@ -1,10 +1,37 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema} from "@ioc:Adonis/Core/Validator"
 import { prisma } from "@ioc:Adonis/Addons/Prisma"
+import _ from 'lodash'
 
 export default class HousesController {
-    public index() {
-        return prisma.houses.findMany();
+    public async index() {
+      const houses = await prisma.houses.findMany({include:{
+          owner:true,
+          amenities:{
+            select:{
+              amenity:{
+                select:{
+                  id:true,
+                  amenity_name:true,
+
+                }
+              }
+            }
+          }
+          }});
+      return houses.map((house)=>{
+        return _.pick
+        (
+          house ,
+          [
+            'id' , 'name' , 'price' , 'number_of_rooms' ,
+            'image' , 'owner.id', 'owner.first_name' ,
+            'owner.last_name','owner.contact_number','owner.physical_address',
+            'amenities'
+          ]
+        )
+      })
+
     }
     public async store({ request }: HttpContextContract) {
         const houseSchema = schema.create({
@@ -19,12 +46,16 @@ export default class HousesController {
                 contact_number: schema.string(),
                 physical_address: schema.string(),
                 email: schema.string()
-            })
+            }),
+          amenities:schema.array().members(schema.object().members({
+            amenityId:schema.number()
+          }))
+
         })
 
         const payload = await request.validate({ schema: houseSchema })
 
-        return await prisma.houses.create({
+        return  prisma.houses.create({
             data: {
                 name: payload.name,
                 location: payload.location,
@@ -33,13 +64,21 @@ export default class HousesController {
                 image: payload.image!,
                 owner: {
                     create: payload.owner
+                },
+              amenities:{
+                createMany: {
+                  data:payload.amenities
+                },
+
                 }
-            }
+
+              }
+
         })
     }
     public async show({ request }: HttpContextContract) {
         const id = request.params().id
-        return await prisma.houses.findUnique({ where: { id: +id } })
+        return prisma.houses.findUnique({ where: { id: +id } })
 
     }
     public async update({ request }: HttpContextContract) {
@@ -63,6 +102,6 @@ export default class HousesController {
     }
     public async destroy({ request }: HttpContextContract) {
         const id = request.params().id
-        return await prisma.houses.delete({ where: { id: +id } });
+        return  prisma.houses.delete({ where: { id: +id } });
     }
 }
