@@ -45,10 +45,11 @@ model users{
   id Int @id @default(autoincrement())
   first_name String
   last_name  String
-  email String
+  email String @unique
   username String
   password String
-  role Int
+  role Int @default(0)
+  reservations reservations[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
 }
@@ -58,8 +59,8 @@ model reservations{
   start_date DateTime
   leave_date DateTime
   total_price Int
-  customer customers @relation(fields: [customerId] , references: [id] , onDelete: Cascade, onUpdate: Cascade)
-  customerId Int
+  user users @relation(fields: [userId] , references: [id] , onDelete: Cascade, onUpdate: Cascade)
+  userId Int
   house houses @relation(fields: [houseId] , references: [id] , onDelete: Cascade, onUpdate: Cascade)
   houseId Int
   createdAt DateTime @default(now())
@@ -83,7 +84,6 @@ model customers{
   email String
   contact String
   password String
-  reservation reservations[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
 

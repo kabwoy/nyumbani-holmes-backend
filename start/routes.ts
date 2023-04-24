@@ -22,6 +22,8 @@ import Route from '@ioc:Adonis/Core/Route'
 import './houses/routes'
 import './amenities/routes'
 import './owners/routes'
+import './users/routes'
+import "./reservations"
 import {HttpContextContract} from "@ioc:Adonis/Core/HttpContext";
 
 Route.get('/', async () => {
